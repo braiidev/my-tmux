@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+SESSION="Desktop"
+
+# Si ya existe, solo attach/switch y listo
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    if [ -n "$TMUX" ]; then
+        tmux switch-client -t "$SESSION"
+    else
+        tmux attach -t "$SESSION"
+    fi
+    exit 0
+fi
+
+# --- Crear sesión y Window1 (Home) ---
+tmux new-session -d -s "$SESSION" -n "Home"
+
+# Pane 0 = A (main). Split horizontal -> Pane 1 = B (30% derecha)
+tmux split-window -h -t "$SESSION:Home" -l "30%"
+
+# Split del pane B en 3 (B, C, D) apilados
+tmux split-window -v -t "$SESSION:Home.1"
+tmux split-window -v -t "$SESSION:Home.2"
+
+# Forzar layout main-vertical prolijo con main al 70%
+tmux set-window-option -t "$SESSION:Home" main-pane-width "70%"
+tmux select-layout -t "$SESSION:Home" main-vertical
+
+# Comandos en B, C, D
+tmux send-keys -t "$SESSION:Home.2" "clock"   Enter
+tmux send-keys -t "$SESSION:Home.3" "tplay"   Enter
+tmux send-keys -t "$SESSION:Home.4" "monitor" Enter
+
+# --- Window2 y Window3, sin comandos ---
+tmux new-window -t "$SESSION:2" -n "Term1"
+tmux new-window -t "$SESSION:3" -n "Term2"
+
+# Foco final: Window1, pane main (A)
+tmux select-window -t "$SESSION:Home"
+tmux select-pane -t "$SESSION:Home.1"
+
+# Attach o switch según si ya estás dentro de tmux
+if [ -n "$TMUX" ]; then
+    tmux switch-client -t "$SESSION"
+else
+    tmux attach -t "$SESSION"
+fi

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python3 ~/.config/tmux/state/border.py $1

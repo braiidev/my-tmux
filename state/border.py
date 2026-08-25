@@ -46,7 +46,7 @@ def toggle_state():
     conn.close()
 
     # Aplicar cambio en tmux inmediatamente
-    subprocess.run(["tmux", "set", "pane-border-status", new_val], check=False)
+    # subprocess.run(["tmux", "set", "pane-border-status", new_val], check=False)
     # print(f"Estado cambiado a: {new_val}")
 
 
