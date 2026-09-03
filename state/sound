@@ -12,8 +12,8 @@ if $COMPATIBLE; then
     ON="SOUND ON"
     OFF="SOUND OFF"
 else
-    ON=" "
-    OFF=" "
+    ON="🕪"
+    OFF="🕨"
 fi
 
 status=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
