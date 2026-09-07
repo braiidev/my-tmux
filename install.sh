@@ -1,5 +1,5 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 REPO="https://github.com/braiidev/my-tmux.git"
 TMUX_DIR="$HOME/.config/tmux"
@@ -7,21 +7,33 @@ TMP_DIR=$(mktemp -d)
 
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+pkg_install() {
+    pkg="$1"
+    if command -v apk >/dev/null 2>&1; then
+        sudo apk add --no-cache "$pkg"
+    elif command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get update -qq
+        sudo apt-get install -y "$pkg"
+    else
+        echo "No sé instalar paquetes en este sistema."
+        echo "Instalá $pkg manualmente y corré el instalador de nuevo."
+        exit 1
+    fi
+}
+
 echo "==> my-tmux installer"
 echo ""
 
 # [1] Verificar Git
 if ! command -v git >/dev/null 2>&1; then
     echo "Git no está instalado."
-    read -r -p "¿Deseas instalar Git? (s/n): " install_git
-
-    if [[ "$install_git" != "s" ]]; then
+    printf "¿Deseas instalar Git? (s/n): "
+    read -r install_git
+    if [ "$install_git" != "s" ]; then
         echo "Instalación cancelada."
         exit 0
     fi
-
-    sudo apt update
-    sudo apt install -y git
+    pkg_install git
 fi
 
 echo "Git está instalado."
@@ -29,15 +41,13 @@ echo "Git está instalado."
 # [2] Verificar TMUX
 if ! command -v tmux >/dev/null 2>&1; then
     echo "TMUX no está instalado."
-    read -r -p "¿Deseas instalar TMUX? (s/n): " install_tmux
-
-    if [[ "$install_tmux" != "s" ]]; then
+    printf "¿Deseas instalar TMUX? (s/n): "
+    read -r install_tmux
+    if [ "$install_tmux" != "s" ]; then
         echo "Instalación de TMUX cancelada."
         exit 0
     fi
-
-    sudo apt update
-    sudo apt install -y tmux
+    pkg_install tmux
 fi
 
 echo "TMUX está instalado."
@@ -52,29 +62,25 @@ git clone --depth 1 "$REPO" "$TMP_DIR/my-tmux"
 mkdir -p "$TMUX_DIR"
 
 # [5] Backup de tmux.conf existente
-if [[ -f "$TMUX_DIR/tmux.conf" ]]; then
-
+if [ -f "$TMUX_DIR/tmux.conf" ]; then
     BACKUP="$TMUX_DIR/tmux.conf.bak"
-
-    if [[ -e "$BACKUP" ]]; then
+    if [ -e "$BACKUP" ]; then
         BACKUP="$TMUX_DIR/tmux.conf.bak.$(date +%Y%m%d-%H%M%S)"
     fi
-
     cp "$TMUX_DIR/tmux.conf" "$BACKUP"
-
     echo ""
     echo "Backup realizado:"
     echo "  $BACKUP"
 fi
 
-# [6] Instalar archivos
+# [6] Instalar archivos (incluye .git para el auto-update estilo ohmytmux)
 echo ""
 echo "==> Instalando archivos..."
 
 cp -r "$TMP_DIR/my-tmux/." "$TMUX_DIR/"
 
-# [7] Eliminar metadata Git por seguridad
-rm -rf "$TMUX_DIR/.git"
+# [7] Dependencias de runtime: directorios de cache y estado
+mkdir -p "$TMUX_DIR/cache"
 
 echo ""
 echo "========================================"
@@ -84,6 +90,6 @@ echo ""
 echo "Instalado en:"
 echo "  $TMUX_DIR"
 echo ""
-echo "Archivos instalados:"
-find "$TMUX_DIR" -maxdepth 1 -type f -printf "  %f\n"
+echo "Auto-update: al entrar a tmux verifica e instala versiones nuevas."
+echo "  check manual:  M-a u  dentro de tmux"
 echo ""

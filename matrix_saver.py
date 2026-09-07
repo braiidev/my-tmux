@@ -9,11 +9,14 @@ import curses
 import random
 import time
 
-CHARS = "アイウエオカキクケコサシスセソタチツテト0123456789#@$%&*+-/\\<>[]{}=~^"
+CHARS = "アイウエオカキクケコサシスセソタチツテト0123456789qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM"
 
 MIN_LEN = 5
-MAX_LEN = 12
-SPEED = 0.045  # segundos entre frames
+MAX_LEN = 10
+SPEED = 0.01  # segundos entre frames
+COLUMNS = 0.1
+GLITCH = 0.25
+MINMAX = [3, 6]
 
 
 class Column:
@@ -27,22 +30,32 @@ class Column:
         self.length = MIN_LEN
         self.chars = []
         self.speed_offset = 0
-        self.reset(height, force_inactive=True)
+        self.reset(height)
 
     def reset(self, height, force_inactive=False):
-        # Alterna entre columna activa y espacio: ~55% de probabilidad de activarse
-        self.active = False if force_inactive else random.random() < 0.55
+        self.active = False if force_inactive else random.random() < COLUMNS
         self.length = random.randint(MIN_LEN, MAX_LEN)
         self.y = -random.randint(0, height // 2)
         self.chars = [random.choice(CHARS) for _ in range(self.length)]
-        self.speed_offset = random.randint(0, 2)  # algunas columnas caen "más lento"
+        self.speed_offset = random.randint(
+            MINMAX[0], MINMAX[1]
+        )  # algunas columnas caen "más lento"
 
-    def step(self, height):
+    def step(self, height, frame):
         if not self.active:
+            # pequeña probabilidad por frame de reactivarse (evita que la
+            # pantalla se "muera" cuando todas las columnas quedan inactive)
+            if random.random() < 0.01:
+                self.reset(height)
             return
+
+        # velocidad variable: algunas columnas caen cada frame, otras cada 2-3
+        if frame % (self.speed_offset + 1) != 0:
+            return
+
         self.y += 1
         # mutación ocasional de caracteres para efecto "glitch"
-        if random.random() < 0.15:
+        if random.random() < GLITCH:
             idx = random.randrange(self.length)
             self.chars[idx] = random.choice(CHARS)
         if self.y - self.length > height:
@@ -73,13 +86,14 @@ def main(stdscr):
     stdscr.nodelay(True)
     curses.start_color()
     curses.use_default_colors()
-    curses.init_pair(1, curses.COLOR_GREEN, -1)
+    curses.init_pair(1, curses.COLOR_CYAN, -1)
     curses.init_pair(2, curses.COLOR_WHITE, -1)
 
     height, width = stdscr.getmaxyx()
     columns = [Column(height) for _ in range(width)]
 
     stdscr.clear()
+    frame = 0
 
     while True:
         key = stdscr.getch()
@@ -94,11 +108,12 @@ def main(stdscr):
 
         stdscr.erase()
         for x, col in enumerate(columns):
-            col.step(height)
+            col.step(height, frame)
             col.draw(stdscr, x, height)
 
         stdscr.refresh()
         time.sleep(SPEED)
+        frame += 1
 
 
 if __name__ == "__main__":

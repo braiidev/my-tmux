@@ -20,20 +20,31 @@ El instalador:
 
 1. Verifica que `git` esté instalado.
 2. Verifica que `tmux` esté instalado.
-3. Pregunta antes de instalar cualquier dependencia faltante.
+3. Pregunta antes de instalar cualquier dependencia faltante (usa `apk` en Alpine, `apt` en Ubuntu/Debian).
 4. Descarga la configuración desde este repositorio.
-5. Instala los archivos en `~/.config/tmux/`.
+5. Instala los archivos en `~/.config/tmux/` **conservando el `.git`** (estilo ohmytmux).
 6. Si ya existe `tmux.conf`, crea un backup antes de reemplazarlo.
 
-La configuración instalada no contiene el directorio `.git`. El repositorio de GitHub funciona como fuente de distribución, mientras que `~/.config/tmux/` contiene únicamente los archivos instalados.
+Al conservar el `.git`, la instalación puede auto-actualizarse sin volver a clonar.
+
+## Auto-update
+
+Al **entrar a `tmux`** se verifica automáticamente (máximo 1 vez por hora) si hay commits nuevos en el repositorio; si los hay, baja la versión (`git pull --ff-only`) y recarga la configuración.
+
+- **`M-a u`** (prefijo `M-a` + `u`) dentro de `tmux`: fuerza el check e instala si hay novedades.
+- Directo desde la shell: `~/.config/tmux/update.sh check --force` o `update.sh pull`.
+
+No reinicia la sesión actual: aplica la nueva configuración recargando `tmux.conf`.
 
 ## Estructura instalada
 
 ```text
 ~/.config/tmux/
 ├── tmux.conf
-├── red.sh
-├── sound.sh
+├── update.sh
+├── matrix_saver.py
+├── themes/          # clasico, mono, calido, alto_contraste, flatline
+├── state/           # border, border.py, network, network-daemon, sound
 └── ...
 ```
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 iface=$(ip addr | awk '/state UP/ {print $2; exit}' | tr -d ':')
 
@@ -14,12 +14,11 @@ for arg in "$@"; do
     esac
 done
 
-# Icons
 WIFI_ICON=" "
 ETH_ICON="󰈀 "
 OFFLINE_ICON="󰖪 "
 
-if $COMPATIBLE; then
+if "$COMPATIBLE"; then
     WIFI="WIFI"
     ETH="ETH"
     OFFLINE="OFFLINE"
@@ -31,17 +30,16 @@ fi
 
 case "$iface" in
 
-    wlp*)
-        ssid=$(nmcli -t -f active,ssid dev wifi |
-            awk -F: '$1=="yes" {print $2; exit}')
+    wlan* | wlp*)
+        ssid=$(iw dev "$iface" link 2>/dev/null | awk '/SSID:/ {sub(/^.*SSID: /, ""); print; exit}')
 
         ip=$(ip -4 addr show "$iface" |
             awk '/inet / {print $2; exit}')
 
-        if $SHORT; then
+        if "$SHORT"; then
             echo "$WIFI"
 
-        elif $FULL; then
+        elif "$FULL"; then
             echo "$WIFI ${ssid:-UNKNOWN} (${ip:-NO IP})"
 
         else
@@ -49,14 +47,14 @@ case "$iface" in
         fi
         ;;
 
-    enp*)
+    enp* | eth*)
         ip=$(ip -4 addr show "$iface" |
             awk '/inet / {print $2; exit}')
 
-        if $SHORT; then
+        if "$SHORT"; then
             echo "$ETH"
 
-        elif $FULL; then
+        elif "$FULL"; then
             echo "$ETH (${ip:-NO IP})"
 
         else

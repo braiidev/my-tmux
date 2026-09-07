@@ -1,0 +1,7 @@
+cache/
+data/
+*.bak
+themes/current
+*.log
+__pycache__/
+*.py[cod]

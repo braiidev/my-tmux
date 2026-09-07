@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
+mkdir -p ~/.config/tmux/cache
 echo "daemon arrancado en $(date)" >> ~/.config/tmux/cache/tmux-network-debug.log
 CACHE=~/.config/tmux/cache/network
 TMP="${CACHE}.tmp"
-mkdir -p ~/.config/tmux/cache
 while true; do
     ~/.config/tmux/state/network "$@" > "$TMP"
     mv "$TMP" "$CACHE"
