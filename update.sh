@@ -26,8 +26,15 @@ _mark() {
     return 0
 }
 
+_version() {
+    git -C "$DIR" describe --tags --abbrev=0 2>/dev/null || echo "sin-tag"
+}
+
 _msg() {
-    tmux display-message "my-tmux: $1" 2>/dev/null || printf 'my-tmux: %s\n' "$1" >&2
+    # Mensaje visible ~5s en la línea de estado de tmux.
+    ( tmux display-message -d 5000 "my-tmux: $1" 2>/dev/null ) \
+        || tmux display-message "my-tmux: $1" 2>/dev/null \
+        || printf 'my-tmux: %s\n' "$1" >&2
 }
 
 _behind() {
@@ -35,17 +42,25 @@ _behind() {
 }
 
 _update() {
+    force="${1:-}"
+    if [ "$force" = "--force" ]; then
+        _msg "comprobando actualización..."
+    fi
     if ! git -C "$DIR" fetch origin >/dev/null 2>&1; then
+        _msg "no pude contactar el repo (sin conexión)"
         return
     fi
     count=$(_behind)
     [ -n "$count" ] || return
     if [ "$count" -le 0 ]; then
+        if [ "$force" = "--force" ]; then
+            _msg "sin novedades — ya estás en $(_version)"
+        fi
         return
     fi
-    _msg "hay $count commits nuevos — actualizando..."
+    _msg "actualizando... ($(_version) → +$count commits)"
     if git -C "$DIR" pull --ff-only; then
-        _msg "actualizado — recargando config"
+        _msg "actualizado a $(_version) — config recargada"
         tmux source-file "$DIR/tmux.conf"
     else
         _msg "pull falló; revisá $DIR"
@@ -56,7 +71,7 @@ _check() {
     case "${2:-}" in
         --force)
             _mark
-            _update
+            _update --force
             ;;
         *)
             if _outdated; then
