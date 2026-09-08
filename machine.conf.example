@@ -1,0 +1,46 @@
+# ============================================================================
+#  machine.conf.example — PLANTILLA de config LOCAL por máquina
+# ============================================================================
+#  Copiá este archivo a ~/.config/tmux/machine.conf y adaptalo a tu equipo.
+#
+#  POR QUÉ EXISTE:
+#  tmux.conf se actualiza con `git pull` (auto-update). Toda personalización
+#  hecha DIRECTAMENTE en tmux.conf se pierde en el próximo pull.
+#  Este archivo se sourcea AL FINAL de tmux.conf, así que:
+#    - es el ÚLTIMO que habla: puede sobreescribir cualquier `set -g`.
+#    - `machine.conf` está en .gitignore → el pull JAMÁS lo toca.
+#    - es tuyo y exclusivo de esta máquina.
+#
+#  EDITARLO:
+#  1) M-e dentro de tmux (abre $EDITOR sobre ~/.config/tmux/machine.conf)
+#  2) si guardás cambios, el script state/edit-config recarga tmux y
+#     reinicia network-daemon automáticamente.
+#  3) si lo editás a mano por fuera, recargá: tmux source-file ~/.config/tmux/tmux.conf
+#
+#  Formato: comandos tmux válidos ('#' = comentario).
+# ============================================================================
+
+
+# ----------------------------------------------------------------------------
+#  MODO COMPATIBLE (iconos planos en vez de nerd/glyphs)
+# ----------------------------------------------------------------------------
+#  Algunas máquinas/terminales no tienen fuentes con glifos nerd/emoji.
+#  Descomentá y poné "true" para que state/sound y state/network usen texto
+#  plano ("SOUND ON/OFF" y "WIFI/ETH/OFFLINE" en vez de 🕪/🕨 y  /󰈀/󰖪).
+#  El cambio aplica solo (el daemon de red relee la opción cada 5s).
+# ----------------------------------------------------------------------------
+set -g @mytmux_compatible true
+#  (dejalo en false o comentado si querés los glifos por defecto)
+
+
+# ----------------------------------------------------------------------------
+#  Otras personalizaciones por máquina (ejemplos comentados)
+# ----------------------------------------------------------------------------
+# # mouse off en laptops con touchpad sensible
+# set -g mouse off
+
+# # status bar abajo (por si arriba molesta con algunos TUI)
+# set -g status-position bottom
+
+# # prefijo distinto en esta máquina
+# set -g prefix C-a

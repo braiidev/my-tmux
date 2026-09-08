@@ -1,0 +1,38 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# edit-config — abrir machine.conf en $EDITOR (bind M-e)
+#   Permite togglear opciones locales por máquina, p.ej. "compatible = true".
+#   machine.conf está gitignored: el pull NUNCA lo pisa.
+#
+#   Dentro de tmux abre una window dedicada con el editor; al guardar:
+#     1. recarga tmux.conf (source-file)
+#     2. reinicia network-daemon (para que la red aplique el nuevo modo al toque)
+#     3. cierra la window de edición
+# ----------------------------------------------------------------------------
+
+CONF=~/.config/tmux/machine.conf
+TMUX_CONF=~/.config/tmux/tmux.conf
+EDITOR_CMD="${EDITOR:-${VISUAL:-nano}}"
+
+# Dentro de tmux: lanzar una window dedicada (este script se re-ejecuta ahí
+# con --once). Fuera de tmux, editar en el terminal actual.
+if [ -n "$TMUX" ] && [ "${1:-}" != "--once" ]; then
+    tmux new-window -n machine "sh '$0' --once"
+    exit 0
+fi
+
+[ -f "$CONF" ] || cp ~/.config/tmux/machine.conf.example "$CONF"
+before=$(cksum "$CONF" 2>/dev/null)
+
+clear
+"$EDITOR_CMD" "$CONF"
+after=$(cksum "$CONF" 2>/dev/null)
+
+if [ "$before" != "$after" ]; then
+    tmux source-file "$TMUX_CONF" 2>/dev/null
+    pkill -f 'state/network-daemon' 2>/dev/null
+    mkdir -p ~/.config/tmux/cache
+    nohup ~/.config/tmux/state/network-daemon >> ~/.config/tmux/cache/network-daemon.log 2>&1 &
+fi
+
+tmux kill-window -t machine 2>/dev/null

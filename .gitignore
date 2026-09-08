@@ -2,6 +2,7 @@ cache/
 data/
 *.bak
 themes/current
+machine.conf
 *.log
 __pycache__/
 *.py[cod]

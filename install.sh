@@ -82,6 +82,12 @@ cp -r "$TMP_DIR/my-tmux/." "$TMUX_DIR/"
 # [7] Dependencias de runtime: directorios de cache y estado
 mkdir -p "$TMUX_DIR/cache"
 
+# [7b] config LOCAL por máquina (machine.conf está gitignored: el pull no lo pisa)
+if [ ! -f "$TMUX_DIR/machine.conf" ]; then
+    cp "$TMUX_DIR/machine.conf.example" "$TMUX_DIR/machine.conf"
+    echo "Creado $TMUX_DIR/machine.conf (editable con M-e dentro de tmux)."
+fi
+
 # [8] Configurar el prompt del shell (zsh + powerlevel10k) con colores armónicos.
 # Solo actúa si el usuario confirma cada paso; si no, hace skip sin romper nada.
 echo ""
@@ -98,4 +104,6 @@ echo "  $TMUX_DIR"
 echo ""
 echo "Auto-update: al entrar a tmux verifica e instala versiones nuevas."
 echo "  check manual:  M-a u  dentro de tmux"
+echo "Config local por máquina (NUNCA pisada):"
+echo "  editar:        M-e  dentro de tmux  ($TMUX_DIR/machine.conf)"
 echo ""

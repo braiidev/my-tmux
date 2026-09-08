@@ -27,6 +27,28 @@ El instalador:
 
 Al conservar el `.git`, la instalación puede auto-actualizarse sin volver a clonar.
 
+## Config local por máquina (`machine.conf`)
+
+`~/.config/tmux/machine.conf` es un archivo **propio de cada máquina**:
+está en `.gitignore`, así que el auto-update (git pull) **nunca lo pisa**.
+
+Se sourcea al final de `tmux.conf`, por lo que puede sobreescribir cualquier
+opción con `set -g`. Dentro de `tmux` se edita con **`M-e`**, que abre
+`$EDITOR` y al guardar recarga `tmux.conf` y reinicia el daemon de red.
+
+Contenido típico:
+
+```text
+set -g @mytmux_compatible true
+```
+
+- `set -g @mytmux_compatible true` → `state/sound` y `state/network` usan
+  texto plano (`SOUND ON`, `WIFI`, `ETH`, `OFFLINE`) en vez de glifos
+  nerd/emoji. Útil en terminales o fuentes sin esos símbolos.
+- `false` (o comentado) → glifos.
+
+La plantilla completa con más ejemplos vive en `machine.conf.example` (dentro de `~/.config/tmux/`).
+
 ## Auto-update
 
 Al **entrar a `tmux`** se verifica automáticamente (máximo 1 vez por hora) si hay commits nuevos en el repositorio; si los hay, baja la versión (`git pull --ff-only`) y recarga la configuración.
@@ -42,9 +64,13 @@ No reinicia la sesión actual: aplica la nueva configuración recargando `tmux.c
 ~/.config/tmux/
 ├── tmux.conf
 ├── update.sh
-├── matrix_saver.py
-├── themes/          # clasico, mono, calido, alto_contraste, flatline
-├── state/           # border, border.py, network, network-daemon, sound
+├── screensaver.py        # matrix screensaver (usa los colores del theme de tmux)
+├── machine.conf          # config LOCAL por máquina (gitignored, no se pisa)
+├── machine.conf.example  # plantilla de machine.conf
+├── install.sh
+├── zsh/                  # p10k_colors.zsh + setup_p10k.sh (prompt armónico)
+├── themes/               # clasico, mono, calido, alto_contraste, flatline
+├── state/                # border, border.py, network, network-daemon, sound, edit-config
 └── ...
 ```
 

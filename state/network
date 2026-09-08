@@ -6,6 +6,13 @@ FULL=false
 SHORT=false
 COMPATIBLE=false
 
+# Modo compatible desde machine.conf (seccion [11] de tmux.conf): si definí
+# "set -g @mytmux_compatible true", usamos texto plano. El flag --compatible
+# pasado por linea de comandos sigue funcionando igual.
+if [ "$(tmux show-option -gv @mytmux_compatible 2>/dev/null)" = "true" ]; then
+    COMPATIBLE=true
+fi
+
 for arg in "$@"; do
     case "$arg" in
         --full)       FULL=true ;;

@@ -17,16 +17,16 @@ function() {
   # El archivo vive en <repo>/zsh/ → themes está en <repo>/themes/
   local themes_dir=$self_dir:h/themes
 
-  # Defaults (alto_contraste): marco=5 texto=7 clima=2 helpers=5 nav=5
-  local -i marco=5 texto=7 clima=2 helpers=5 nav=5
+  # Defaults (clasico): marco=6 texto=7 clima=2 helpers=3 nav=6
+  local -i marco=6 texto=7 clima=2 helpers=3 nav=6
 
   local cur_name
-  # themes/current puede no existir (gitignored) → usar alto_contraste por defecto.
+  # themes/current puede no existir (gitignored) → usar clasico por defecto.
   if [[ -r "$themes_dir/current" ]]; then
     cur_name=$(<"$themes_dir/current")
     cur_name=${cur_name%%[$'\n\r']}
   fi
-  cur_name=${cur_name:-alto_contraste}
+  cur_name=${cur_name:-clasico}
 
   local conf="$themes_dir/$cur_name.conf"
   if [[ -r "$conf" ]]; then
