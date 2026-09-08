@@ -24,13 +24,13 @@
 # ----------------------------------------------------------------------------
 #  MODO COMPATIBLE (iconos planos en vez de nerd/glyphs)
 # ----------------------------------------------------------------------------
-#  Algunas máquinas/terminales no tienen fuentes con glifos nerd/emoji.
+#  Alguna máquinas/terminales no tienen fuentes con glifos nerd/emoji.
 #  Descomentá y poné "true" para que state/sound y state/network usen texto
 #  plano ("SOUND ON/OFF" y "WIFI/ETH/OFFLINE" en vez de 🕪/🕨 y  /󰈀/󰖪).
 #  El cambio aplica solo (el daemon de red relee la opción cada 5s).
+#  Default: false (glifos).
 # ----------------------------------------------------------------------------
-set -g @mytmux_compatible true
-#  (dejalo en false o comentado si querés los glifos por defecto)
+set -g @mytmux_compatible false
 
 
 # ----------------------------------------------------------------------------
