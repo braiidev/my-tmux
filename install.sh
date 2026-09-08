@@ -82,6 +82,12 @@ cp -r "$TMP_DIR/my-tmux/." "$TMUX_DIR/"
 # [7] Dependencias de runtime: directorios de cache y estado
 mkdir -p "$TMUX_DIR/cache"
 
+# [8] Configurar el prompt del shell (zsh + powerlevel10k) con colores armónicos.
+# Solo actúa si el usuario confirma cada paso; si no, hace skip sin romper nada.
+echo ""
+echo "==> Configurando prompt del shell (zsh + p10k)..."
+sh "$TMUX_DIR/zsh/setup_p10k.sh" || echo "  (config del prompt omitida)"
+
 echo ""
 echo "========================================"
 echo " my-tmux instalado correctamente"
