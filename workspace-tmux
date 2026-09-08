@@ -23,7 +23,7 @@ tmux split-window -v -t "$SESSION:Home.1"
 tmux split-window -v -t "$SESSION:Home.2"
 
 # Forzar layout main-vertical prolijo con main al 70%
-tmux set-window-option -t "$SESSION:Home" main-pane-width "75%"
+tmux set-window-option -t "$SESSION:Home" main-pane-width "70%"
 tmux select-layout -t "$SESSION:Home" main-vertical
 
 # Comandos en B, C, D
