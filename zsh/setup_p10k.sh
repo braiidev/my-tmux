@@ -127,18 +127,33 @@ else
     echo "ADVERTENCIA: no existe ~/.zshrc; crealo y seteá ZSH_THEME='powerlevel10k/powerlevel10k'."
 fi
 
-# 3c) Inyectar el source armónico en .p10k.zsh (o crearlo)
+# 3c) Inyectar el source armónico en .p10k.zsh (o crearlo).
+# Debe ir DENTRO del bloque `() { ... }`, justo antes del `p10k reload`, para
+# que el reload aplique los colores del tema de inmediato.
 P10K_FILE="$HOME/.p10k.zsh"
-INJECT="
-# my-tmux: colores del prompt según el tema de tmux activo
-$COLORS_SOURCE"
 
 if [ -f "$P10K_FILE" ]; then
     if grep -q 'p10k_colors.zsh' "$P10K_FILE"; then
         say ".p10k.zsh ya tiene el source de colores — sin cambios."
     else
         cp "$P10K_FILE" "$P10K_FILE.bak"
-        printf '%s\n' "$INJECT" >> "$P10K_FILE"
+        # Insertar el source dentro del bloque, justo antes del `p10k reload`,
+        # para que el reload aplique los colores del tema de inmediato.
+        if grep -q 'p10k reload' "$P10K_FILE"; then
+            awk '
+                /p10k reload/ && !done {
+                    print "# my-tmux: colores del prompt segun tema activo de tmux"
+                    print "source ~/.config/tmux/zsh/p10k_colors.zsh"
+                    done = 1
+                }
+                { print }
+            ' "$P10K_FILE" > "$P10K_FILE.my-tmux"
+            mv "$P10K_FILE.my-tmux" "$P10K_FILE"
+        else
+            # Caso raro sin reload: append al final (igual las variables globales
+            # se leen en cada render del prompt).
+            printf '\n# my-tmux: colores del prompt según el tema de tmux activo\nsource ~/.config/tmux/zsh/p10k_colors.zsh\n' >> "$P10K_FILE"
+        fi
         say "Inyectado source de colores en .p10k.zsh (backup: .p10k.zsh.bak)."
     fi
 elif [ -f "$HOME/.zshrc" ]; then
@@ -152,9 +167,10 @@ elif [ -f "$HOME/.zshrc" ]; then
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs newline prompt_char)
   typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time time)
   typeset -g POWERLEVEL9K_BACKGROUND=0
+  (( ! $+functions[p10k] )) || p10k reload
 }
 EOF
-    printf '%s\n' "$INJECT" >> "$P10K_FILE"
+    printf '\n# my-tmux: colores del prompt según el tema de tmux activo\nsource ~/.config/tmux/zsh/p10k_colors.zsh\n' >> "$P10K_FILE"
     say "Creado .p10k.zsh mínimo con el source de colores."
 fi
 
