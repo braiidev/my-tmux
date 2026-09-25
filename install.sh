@@ -79,6 +79,9 @@ echo "==> Instalando archivos..."
 
 cp -r "$TMP_DIR/my-tmux/." "$TMUX_DIR/"
 
+# Los docs de desarrollo (dev/) no son configuracion: no van a ~/.config/tmux/
+rm -rf "$TMUX_DIR/dev"
+
 # [7] Dependencias de runtime: directorios de cache y estado
 mkdir -p "$TMUX_DIR/cache"
 

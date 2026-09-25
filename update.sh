@@ -60,6 +60,8 @@ _update() {
     fi
     _msg "actualizando... ($(_version) → +$count commits)"
     if git -C "$DIR" pull --ff-only; then
+        # El pull vuelve a traer dev/ (docs de desarrollo): sacarlo de la config.
+        rm -rf "$DIR/dev"
         _msg "actualizado a $(_version) — config recargada"
         tmux source-file "$DIR/tmux.conf"
     else
