@@ -1,11 +1,11 @@
 # TODO
 
 ## Doing
-- (vacío — esperando próxima task)
+- [ ] v0.10 fix: prueba real de instalación en máquina nueva — desplegando en Raspberry Pi (192.168.1.55, Raspbian 12 armhf)
 
 ## Next
-- [ ] v0.8 fix: prueba real de instalación en máquina nueva (nohup/cache/auto-update desde cero)
 - [ ] v0.8 feat: revisar gestión de `#(sh ...)` vs `#(...)` en status-right si hace falta
+- [ ] v0.8 chore: sacar TODO/TODO.md de la distribución (son docs de desarrollo, no configuración)
 
 ## Done
 - [x] v0.9 feat: feedback de update.sh (comprobando/actualizando/actualizado a vX)
