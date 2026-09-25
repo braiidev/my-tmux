@@ -1,13 +1,16 @@
 # TODO
 
 ## Doing
-- [ ] v0.10 fix: prueba real de instalación en máquina nueva — desplegando en Raspberry Pi (192.168.1.55, Raspbian 12 armhf)
+- (vacío — esperando próxima task)
 
 ## Next
 - [ ] v0.8 feat: revisar gestión de `#(sh ...)` vs `#(...)` en status-right si hace falta
-- [ ] v0.8 chore: sacar TODO/TODO.md de la distribución (son docs de desarrollo, no configuración)
+- [ ] v0.13 feat: `install.sh` se come el stdin en los `read` (el `git clone` interno los traga y se salta oh-my-zsh)
 
 ## Done
+- [x] v0.12 chore: docs de desarrollo a dev/, excluidos del install y del auto-update
+- [x] v0.13 fix: prueba real de instalación en máquina nueva — desplegado en Raspberry Pi 192.168.1.55 (Raspbian 12 armhf)
+- [x] v0.11 chore: fuera el script huérfano workspace-tmux (lanza tplay/monitor, máquina-específico)
 - [x] v0.9 feat: feedback de update.sh (comprobando/actualizando/actualizado a vX)
 - [x] v0.8 fix: main-pane al 70% en workspace (M-0) y bind M-h
 - [x] v0.7 feat: config local machine.conf (M-e/$EDITOR) + modo compatible + screensaver + reorg tmux.conf
