@@ -7,6 +7,7 @@
 - [ ] v0.8 feat: revisar gestión de `#(sh ...)` vs `#(...)` en status-right si hace falta
 
 ## Done
+- [x] v0.16 fix: restaurar el targeting original de las apps (main vacío, clock/tplay/monitor en 2/3/4)
 - [x] v0.15 fix: `install.sh` se come el stdin — clone a `/dev/null` + `ask()` lee de `/dev/tty`
 - [x] v0.14 fix: workspace-tmux de vuelta al repo, portable (apps solo si existen) + binding M-0 a prueba de fallos
 - [x] v0.12 chore: docs de desarrollo a dev/, excluidos del install y del auto-update

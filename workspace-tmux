@@ -42,9 +42,10 @@ tmux select-layout -t "$SESSION:Home" main-vertical
 sleep 0.5
 
 # --- Apps en los 3 panes del panel derecho ---
-launch clock   "$SESSION:Home.1"
-launch tplay   "$SESSION:Home.2"
-launch monitor "$SESSION:Home.3"
+# Con pane-base-index 1 el main es el pane 1 y la columna derecha son 2, 3 y 4.
+launch clock   "$SESSION:Home.2"
+launch tplay   "$SESSION:Home.3"
+launch monitor "$SESSION:Home.4"
 
 # --- Ventanas auxiliares ---
 tmux new-window -t "$SESSION:2" -n "Term1"
