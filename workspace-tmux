@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# workspace-tmux — despliega el layout "Desktop": pane main al 70% + columna
+# derecha dividida en 3 (clock, tplay, monitor) + 2 ventanas auxiliares.
+#
+# Portable: cada app solo se lanza si existe en esta maquina. En una maquina
+# sin ellas el layout se arma igual, con los 3 panes limpios.
+
+SESSION="Desktop"
+
+# Idempotente: si la sesion ya existe, solo attach/switch
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    if [ -n "$TMUX" ]; then
+        tmux switch-client -t "$SESSION"
+    else
+        tmux attach -t "$SESSION"
+    fi
+    exit 0
+fi
+
+# Lanzar una app en un pane solo si esta disponible en el PATH
+launch() {
+    if command -v "$1" >/dev/null 2>&1; then
+        tmux send-keys -t "$2" "$1" Enter
+    fi
+}
+
+# --- Crear sesion y Window1 (Home) ---
+# Pane 0 = main (se deja libre para el shell normal)
+tmux new-session -d -s "$SESSION" -n "Home"
+
+# Panel derecho: 25% de ancho, partido en 3 filas -> panes 1, 2 y 3
+tmux split-window -h -t "$SESSION:Home" -l "25%"
+tmux split-window -v -t "$SESSION:Home.1"
+tmux split-window -v -t "$SESSION:Home.2"
+
+# Layout prolijo con el main al 70%
+tmux set-window-option -t "$SESSION:Home" main-pane-width "70%"
+tmux select-layout -t "$SESSION:Home" main-vertical
+
+# Los shells de los panes recien creados tardan en tomar la entrada: sin esta
+# pausa los send-keys se pierden y las apps no llegan a arrancar.
+sleep 0.5
+
+# --- Apps en los 3 panes del panel derecho ---
+launch clock   "$SESSION:Home.1"
+launch tplay   "$SESSION:Home.2"
+launch monitor "$SESSION:Home.3"
+
+# --- Ventanas auxiliares ---
+tmux new-window -t "$SESSION:2" -n "Term1"
+tmux new-window -t "$SESSION:3" -n "Term2"
+
+# --- Foco final: Window1, pane main ---
+tmux select-window -t "$SESSION:Home"
+tmux select-pane -t "$SESSION:Home.1"
+
+# Attach o switch segun si ya estas dentro de tmux
+if [ -n "$TMUX" ]; then
+    tmux switch-client -t "$SESSION"
+else
+    tmux attach -t "$SESSION"
+fi
