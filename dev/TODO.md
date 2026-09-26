@@ -1,12 +1,13 @@
 # TODO
 
 ## Doing
-- [ ] v0.15 fix: `install.sh` se come el stdin en los `read` (el `git clone` interno los traga y se salta oh-my-zsh)
+- (vacío — esperando próxima task)
 
 ## Next
 - [ ] v0.8 feat: revisar gestión de `#(sh ...)` vs `#(...)` en status-right si hace falta
 
 ## Done
+- [x] v0.15 fix: `install.sh` se come el stdin — clone a `/dev/null` + `ask()` lee de `/dev/tty`
 - [x] v0.14 fix: workspace-tmux de vuelta al repo, portable (apps solo si existen) + binding M-0 a prueba de fallos
 - [x] v0.12 chore: docs de desarrollo a dev/, excluidos del install y del auto-update
 - [x] v0.13 fix: prueba real de instalación en máquina nueva — desplegado en Raspberry Pi 192.168.1.55 (Raspbian 12 armhf)

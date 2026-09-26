@@ -21,15 +21,27 @@ pkg_install() {
     fi
 }
 
+# Pregunta por stdin, pero si el instalador llegó por `curl | sh` el stdin es
+# el propio script y un `read` se comería el código. En ese caso se lee de
+# /dev/tty; si tampoco hay terminal, se responde "no" y se sigue.
+ask() {
+    printf '%s' "$1"
+    reply=""
+    if [ -t 0 ]; then
+        read -r reply
+    elif [ -r /dev/tty ]; then
+        read -r reply 2>/dev/null < /dev/tty || true
+    fi
+    [ "$reply" = "s" ]
+}
+
 echo "==> my-tmux installer"
 echo ""
 
 # [1] Verificar Git
 if ! command -v git >/dev/null 2>&1; then
     echo "Git no está instalado."
-    printf "¿Deseas instalar Git? (s/n): "
-    read -r install_git
-    if [ "$install_git" != "s" ]; then
+    if ! ask "¿Deseas instalar Git? (s/n): "; then
         echo "Instalación cancelada."
         exit 0
     fi
@@ -41,9 +53,7 @@ echo "Git está instalado."
 # [2] Verificar TMUX
 if ! command -v tmux >/dev/null 2>&1; then
     echo "TMUX no está instalado."
-    printf "¿Deseas instalar TMUX? (s/n): "
-    read -r install_tmux
-    if [ "$install_tmux" != "s" ]; then
+    if ! ask "¿Deseas instalar TMUX? (s/n): "; then
         echo "Instalación de TMUX cancelada."
         exit 0
     fi
@@ -56,7 +66,10 @@ echo "TMUX está instalado."
 echo ""
 echo "==> Descargando my-tmux..."
 
-git clone --depth 1 "$REPO" "$TMP_DIR/my-tmux"
+# Sin `< /dev/null` git puede leer del stdin y vaciar el buffer del terminal
+# (o, con `curl | sh`, comer el resto del script). Los `read` de más abajo se
+# quedan sin entrada y el instalador se salta pasos.
+git clone --depth 1 "$REPO" "$TMP_DIR/my-tmux" < /dev/null
 
 # [4] Crear directorio de configuración
 mkdir -p "$TMUX_DIR"

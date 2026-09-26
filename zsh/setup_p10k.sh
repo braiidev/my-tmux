@@ -22,7 +22,18 @@ say() { printf 'setup-zsh: %s\n' "$*"; }
 ask() {
     # $1 = pregunta. Devuelve 0 si "s", 1 si "no".
     printf '%s (s/n): ' "$1"
-    read -r ans
+    # Si install.sh llegó por `curl | sh`, stdin es el propio script: un `read`
+    # se comería el código. Se lee de /dev/tty y, si no hay terminal, se
+    # responde "no" para omitir el paso sin romper la instalación.
+    ans=""
+    if [ -t 0 ]; then
+        read -r ans
+    elif [ -r /dev/tty ]; then
+        read -r ans 2>/dev/null < /dev/tty || true
+    else
+        say "sin terminal disponible para preguntar — se omite."
+        return 1
+    fi
     case "$ans" in
         s|S|y|Y) return 0 ;;
         *) return 1 ;;
